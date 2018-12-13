@@ -1,0 +1,55 @@
+---
+
+- hosts: web
+  vars: 
+    http_port: 80
+    doc_root: /var/www/html/demo08
+    name: user01
+
+  tasks:
+  - name: Install Apache Packages on CentOS
+    yum: name=httpd state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Install Apache Packages on Ubuntu
+    apt: name=apache2 state=present
+    when: ansible_os_family == "Ubuntu"
+
+  - name: Start Apache Service on CentOS 
+    service: name=httpd state=started 
+    when: ansible_os_family == "RedHat"
+
+  - name: Start Apache Service on Ubuntu 
+    service: name=apache2 state=started 
+    when: ansible_os_family == "Ubuntu"
+
+  - name: Deploy Static Site File
+    copy: src=templates/index.html dest=/var/www/html/index.html
+    notify:
+      - Restart Apache
+
+  - name: Create a new site location
+    file: path={{doc_root}} state=directory
+
+  - name: Download Mario
+    get_url: url="http://www.mariomayhem.com/downloads/wallpapers/2/nsmb_wp2_1024.jpg"  dest={{doc_root}}/mario.jpg mode=0755
+
+  - name: Deploy Info html Page to site.
+    template: src=templates/info.j2 dest={{doc_root}}/info.html
+
+  - name: Install Java Packages
+    yum: name=java state=present
+
+  - name: Copy JAR File to site Location.
+    copy: src=templates/atmosphere-v1.jar dest={{doc_root}}/atmosphere-v1.jar
+
+  - name: Deploy JAR atmosphere. 
+    shell: nohup /bin/java -jar {{doc_root}}/atmosphere-v1.jar & > nohup.out
+
+
+  handlers:
+  - name: Restart Apache
+    service: name=httpd state=restarted
+
+
+
