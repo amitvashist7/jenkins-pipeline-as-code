@@ -50,6 +50,7 @@ stage ('Molecule test') {
         molecule test 
         '''
 }
+}
 
 stage('Ansible PROD Deployment'){
 sh 'ansible-playbook -i  ../../../ansible/inventory  ../../../ansible/webservers.yaml'
