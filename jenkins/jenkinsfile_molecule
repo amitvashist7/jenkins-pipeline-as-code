@@ -35,8 +35,8 @@ stage ('Setup Python virtual environment') {
    
         sh '''
           pip install virtualenv
-          virtualenv virtenv
-          source virtenv/bin/activate
+          virtualenv /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv
+          source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
           pip install --upgrade ansible molecule docker
         '''
      
@@ -56,8 +56,7 @@ sh '''
 stage ('Molecule test') {
    steps {
      sh '''
-        source /root/my_env/bin/activate
-		cd demo14/roles/webserver
+        source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
         molecule test 
         '''
 }
