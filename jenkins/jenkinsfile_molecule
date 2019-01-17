@@ -31,10 +31,21 @@ sh "echo '<h1>TASK BUILD ID: ${env.BUILD_DISPLAY_NAME}</h1>' > index.html"
 sh 'cp -rf index.html ../../../ansible/templates/index.html'
 }
 
+    stage ('Setup Python virtual environment') {
+      steps {
+        sh '''
+          pip install virtualenv
+          virtualenv virtenv
+          source virtenv/bin/activate
+          pip install --upgrade ansible molecule docker
+        '''
+      }
+    }
+
 
 stage ('Setup Python virtual environment') {
 sh '''
-          source /root/my_env/bin/activate
+          source virtenv/bin/activate
           docker -v
           python -V
           ansible --version
