@@ -1,0 +1,76 @@
+
+node('master'){
+    
+notify('Project Build Started')
+
+try{
+
+stage('git checkout') {
+git 'https://github.com/amitvashist7/jenkins-pipeline-as-code.git'
+}    
+    
+
+def project_path="atmosphere/spring-boot-samples/spring-boot-sample-atmosphere"
+
+dir(project_path) {
+
+stage('Build & Compile') {    
+sh 'mvn clean package'
+}
+stage('Archive Packages' ) {
+archiveArtifacts 'target/*.jar'
+}
+
+stage('Deploy Code to Stage Env.'){
+sh 'docker-compose up -d --build'
+}
+
+stage('Getting Ready for Aisble Prod. Deployment'){
+sh 'cp -rf target/*.jar ../../../ansible/templates/atmosphere-v1.jar'
+sh "echo '<h1>TASK BUILD ID: ${env.BUILD_DISPLAY_NAME}</h1>' > index.html"
+sh 'cp -rf index.html ../../../ansible/templates/index.html'
+}
+
+
+stage ('Setup Python virtual environment') {
+sh '''
+          source /root/my_env/bin/activate
+          docker -v
+          python -V
+          ansible --version
+          molecule --version
+        '''
+}
+
+stage ('Molecule test') {
+   steps {
+     sh '''
+        source /root/my_env/bin/activate
+		cd demo14/roles/webserver
+        molecule test 
+        '''
+}
+
+stage('Ansible PROD Deployment'){
+sh 'ansible-playbook -i  ../../../ansible/inventory  ../../../ansible/webservers.yaml'
+
+}
+
+notify('Project Build Completed ')
+}
+
+}catch(err) {
+notify("Error ${err}")
+currentBuild.result='FAILURE'
+}
+
+}
+def notify(status){
+    emailext(
+        to: "amitvashist7@gmail.com",
+        subject: "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+        body: """<p>${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' :</p>
+        <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+        
+        )
+}
