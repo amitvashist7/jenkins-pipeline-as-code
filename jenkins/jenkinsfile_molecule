@@ -45,7 +45,7 @@ stage ('Setup Python virtual environment') {
 
 stage ('Setup Python virtual environment') {
 sh '''
-          source virtenv/bin/activate
+          source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
           docker -v
           python -V
           ansible --version
