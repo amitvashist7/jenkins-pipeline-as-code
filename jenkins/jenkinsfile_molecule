@@ -33,31 +33,10 @@ sh 'cp -rf index.html ../../../ansible/templates/index.html'
 
 stage ('Setup Python virtual environment') {
    
-        sh '''
-          pip install virtualenv
-          virtualenv /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv
-          source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
-          pip install --upgrade ansible molecule docker
-        '''
-     
-}
-
-
-stage ('Setup Python virtual environment') {
-sh '''
-          source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
-          docker -v
-          python -V
-          ansible --version
-          molecule --version
-        '''
-}
-
-stage ('Molecule test') {
-   steps {
      sh '''
-        source /root/.jenkins/workspace/test01/atmosphere/spring-boot-samples/spring-boot-sample-atmosphere/virtenv/bin/activate
+        cd ../../../ansible/roles 
         molecule test 
+        cd -
         '''
 }
 }
