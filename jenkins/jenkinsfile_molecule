@@ -34,7 +34,7 @@ sh 'cp -rf index.html ../../../ansible/templates/index.html'
 stage ('Setup Python virtual environment') {
    
      sh '''
-        cd ../../../ansible/roles 
+        cd ../../../ansible/roles/webserver 
         molecule test 
         cd -
         '''
