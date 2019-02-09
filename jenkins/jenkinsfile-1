@@ -15,7 +15,7 @@ def project_path="atmosphere/spring-boot-samples/spring-boot-sample-atmosphere"
 dir(project_path) {
 
 stage('Build & Compile') {    
-sh 'mvn cleans package'
+sh 'mvn clean package'
 }
 stage('Archive Packages' ) {
 archiveArtifacts 'target/*.jar'
